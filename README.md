@@ -41,6 +41,22 @@ Workflow:
 4. Orca converts the response to speech and plays it through the system output.
 5. The assistant returns to the idle state, waiting for the wake word again.
 
+## Raspberry Pi Deployment (Docker)
+
+For a turnkey setup on a Raspberry Pi 5 with SSH access:
+
+1. Copy the environment template and set your Picovoice key and overrides.
+   ```bash
+   cp .env.example .env
+   nano .env  # update PICOVOICE_ACCESS_KEY at minimum
+   ```
+2. Run the bootstrap script (installs Docker if needed, builds, and starts the container).
+   ```bash
+   bash deploy/pi-bootstrap.sh
+   ```
+
+The container runs with `network_mode: host`, mounts the Pi’s audio interface (`/dev/snd`), and restarts automatically after reboots (`docker compose up -d --build` behind the scenes).
+
 ## Troubleshooting
 
 - Run from a quiet environment to improve wake word detection and speech recognition.

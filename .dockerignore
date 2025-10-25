@@ -1,0 +1,15 @@
+.git
+.github
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.swp
+*.swo
+*.log
+env/
+build/
+dist/
+*.egg-info
+models/vosk-model-small-en-us-0.15.zip
+.DS_Store
