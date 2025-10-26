@@ -1,0 +1,6 @@
+scripts/import_plan_to_github.py
+
+# Environment variables (contains secrets like GITHUB_TOKEN and PICOVOICE_ACCESS_KEY)
+.env
+.env.local
+.env.*.local
