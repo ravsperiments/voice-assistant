@@ -5,11 +5,12 @@ Manages conversation history as a simple list of dictionaries,
 handles pruning, ending detection, and formatting for LLM consumption.
 """
 
+import config
+
 # Global conversation history
 conversation_history = []
 
 # Configuration constants
-MAX_HISTORY_TURNS = 10  # Maximum turns to keep (1 turn = user + assistant message pair)
 ENDING_PHRASES = [
     "goodbye",
     "bye",
@@ -66,7 +67,7 @@ def _prune_history() -> None:
     Keeps only the last N exchanges (user+assistant pairs).
     MAX_HISTORY_TURNS of 10 means 20 messages (10 user + 10 assistant).
     """
-    max_messages = MAX_HISTORY_TURNS * 2  # 2 messages per turn
+    max_messages = config.MAX_HISTORY_TURNS * 2  # 2 messages per turn
     if len(conversation_history) > max_messages:
         # Remove oldest messages to keep only the last max_messages
         excess = len(conversation_history) - max_messages

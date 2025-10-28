@@ -20,3 +20,9 @@ WAKE_WORD_NAME = _env("WAKE_WORD_NAME", "jarvis")  # Friendly name used for logg
 # Provide the absolute path to your custom Porcupine keyword (.ppn) file if using a non-built-in wake word.
 # Example: WAKE_WORD_CUSTOM_PATH = "models/picovoice/hey-buddy_en_mac_v3_0_0.ppn"
 WAKE_WORD_CUSTOM_PATH = _env("WAKE_WORD_CUSTOM_PATH", None)
+
+# Conversation Settings (Phase 1)
+MAX_HISTORY_TURNS = int(_env("MAX_HISTORY_TURNS", "10"))  # Maximum turns to keep in conversation history (1 turn = user + assistant pair)
+AWAITING_TIMEOUT = float(_env("AWAITING_TIMEOUT", "10.0"))  # Seconds to wait for next user turn before ending conversation
+MAX_RESPONSE_TOKENS = int(_env("MAX_RESPONSE_TOKENS", "100"))  # Maximum tokens for LLM response (~15-20 seconds of speech)
+VAD_ENERGY_THRESHOLD = int(_env("VAD_ENERGY_THRESHOLD", "500"))  # Energy level threshold for voice activity detection
