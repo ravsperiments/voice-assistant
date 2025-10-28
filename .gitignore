@@ -4,3 +4,7 @@ scripts/import_plan_to_github.py
 .env
 .env.local
 .env.*.local
+
+
+# Project artifacts
+.project_artifacts/
