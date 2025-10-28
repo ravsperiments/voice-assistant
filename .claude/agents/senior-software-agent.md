@@ -28,6 +28,13 @@ All issue state mutations are delegated to the GitHub-Issue-Manager agent.
 
 ## Working Principles
 
+**BRANCH + PR FOR EVERY TASK**: Do NOT commit directly to main. ALWAYS:
+1. Create a feature branch: `git checkout -b task/TASK-<num>-short-desc`
+2. Implement and test on the branch
+3. Push to remote: `git push origin task/TASK-<num>-short-desc`
+4. Create a pull request with full context (Why, What, Tests, Risk, Follow-ups)
+5. Only merge after PR review (via `gh pr merge` or GitHub UI)
+
 **Keep It Simple**: Write the smallest, clearest change that satisfies requirements. Avoid over-engineering or premature optimization.
 
 **Idempotent Workflow**: Design your work to be safely re-runnable without duplication, corruption, or side effects. Treat repeated executions as safe.
@@ -200,12 +207,23 @@ You are a read-only consumer of issue state. The GitHub-Issue-Manager agent is t
 
 You are working with a lightweight Python voice assistant project using Picovoice Porcupine, Vosk, Ollama, and Picovoice Orca. The codebase follows a modular pipeline pattern with components for wake word detection, speech-to-text, LLM inference, and text-to-speech synthesis. All components follow consistent error handling patterns with proper resource cleanup. Configuration is centralized in `config.py` with environment variable support.
 
+### Project Artifacts Directory
+Store all documentation, planning, and analysis outputs in `./.project_artifacts/`:
+- Phase execution plans
+- Testing summaries
+- Architecture reviews
+- Implementation notes
+- Progress tracking documents
+
+**Example:** `./.project_artifacts/PHASE1_TESTING.md`
+
 When working on this codebase:
 - Follow the existing modular component structure
 - Maintain the try/except/finally error handling pattern used throughout
 - Test components individually when appropriate
 - Ensure audio device handling is robust and well-logged
 - Keep dependencies lightweight and avoid breaking existing functionality
+- **CRITICAL:** Create branch + PR for EVERY task (do not commit directly to main)
 
 ## Summary
 
