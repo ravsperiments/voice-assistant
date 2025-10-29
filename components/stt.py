@@ -21,30 +21,62 @@ CHUNK = 512  # Reduced chunk size for faster VAD response
 def transcribe_audio():
     """
     Captures audio from the microphone and transcribes it to text using Vosk.
+
+    Returns:
+        str: Transcribed text from the audio input.
+
+    Raises:
+        Exception: If audio capture or transcription fails.
     """
-    model = Model(MODEL_PATH)
-    recognizer = KaldiRecognizer(model, RATE)
+    model = None
+    recognizer = None
+    audio = None
+    stream = None
 
-    audio = pyaudio.PyAudio()
-    stream = audio.open(format=FORMAT,
-                        channels=CHANNELS,
-                        rate=RATE,
-                        input=True,
-                        frames_per_buffer=CHUNK)
+    try:
+        model = Model(MODEL_PATH)
+        recognizer = KaldiRecognizer(model, RATE)
 
-    print("Listening for command...")
+        audio = pyaudio.PyAudio()
+        stream = audio.open(format=FORMAT,
+                            channels=CHANNELS,
+                            rate=RATE,
+                            input=True,
+                            frames_per_buffer=CHUNK)
 
-    while True:
-        data = stream.read(CHUNK)
-        if recognizer.AcceptWaveform(data):
-            result = json.loads(recognizer.Result())
-            text = result.get("text", "")
-            if text:
-                logger.info(f"Recognized: {text}")
+        print("Listening for command...")
+
+        while True:
+            # Use exception_on_overflow=False to drop frames instead of crashing
+            # This prevents OSError: [Errno -9981] Input overflowed
+            data = stream.read(CHUNK, exception_on_overflow=False)
+
+            if recognizer.AcceptWaveform(data):
+                result = json.loads(recognizer.Result())
+                text = result.get("text", "")
+                if text:
+                    logger.info(f"Recognized: {text}")
+                    return text
+
+    except OSError as e:
+        logger.error(f"Audio input error: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"Transcription error: {e}")
+        raise
+    finally:
+        # Clean up resources in reverse order of creation
+        if stream is not None:
+            try:
                 stream.stop_stream()
                 stream.close()
+            except Exception as e:
+                logger.warning(f"Error closing audio stream: {e}")
+        if audio is not None:
+            try:
                 audio.terminate()
-                return text
+            except Exception as e:
+                logger.warning(f"Error terminating PyAudio: {e}")
 
 
 def has_voice_activity(timeout_seconds: float = 10.0, energy_threshold: int = 500) -> bool:
@@ -79,8 +111,8 @@ def has_voice_activity(timeout_seconds: float = 10.0, energy_threshold: int = 50
                 logger.debug(f"Voice activity timeout after {elapsed:.1f}s")
                 return False
 
-            # Read audio chunk
-            data = stream.read(CHUNK)
+            # Read audio chunk with overflow protection
+            data = stream.read(CHUNK, exception_on_overflow=False)
 
             # Convert bytes to numpy array
             audio_array = np.frombuffer(data, dtype=np.int16)
