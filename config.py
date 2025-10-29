@@ -10,6 +10,14 @@ def _env(key: str, default: str | None = None) -> str | None:
     return value
 
 
+def _env_bool(key: str, default: bool = False) -> bool:
+    """Parse boolean environment variable."""
+    value = os.getenv(key)
+    if value is None:
+        return default
+    return value.lower() in ('true', '1', 'yes', 'on')
+
+
 PICOVOICE_ACCESS_KEY = _env("PICOVOICE_ACCESS_KEY", "rGn8kk49k1Dr5RAnkO0uVSpn+koiCn6s3KZyWXSnUUhPSZh/5HcGkw==") # Replace with your key
 
 OLLAMA_API_URL = _env("OLLAMA_API_URL", "http://localhost:11434/api/generate")
@@ -26,3 +34,7 @@ MAX_HISTORY_TURNS = int(_env("MAX_HISTORY_TURNS", "10"))  # Maximum turns to kee
 AWAITING_TIMEOUT = float(_env("AWAITING_TIMEOUT", "10.0"))  # Seconds to wait for next user turn before ending conversation
 MAX_RESPONSE_TOKENS = int(_env("MAX_RESPONSE_TOKENS", "100"))  # Maximum tokens for LLM response (~15-20 seconds of speech)
 VAD_ENERGY_THRESHOLD = int(_env("VAD_ENERGY_THRESHOLD", "500"))  # Energy level threshold for voice activity detection
+
+# Conversation Logging
+LOGGING_ENABLED = _env_bool('LOGGING_ENABLED', True)  # Enable conversation logging to database
+LOGGING_DB_PATH = _env('LOGGING_DB_PATH', 'data/conversations.db')  # Path to SQLite database file

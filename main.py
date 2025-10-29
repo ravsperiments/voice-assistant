@@ -2,12 +2,17 @@
 # main.py
 
 import logging
+import sys
 import config
 from components.wake_word import wait_for_wake_word
 from components.stt import transcribe_audio, has_voice_activity
 from components.llm import generate_response
 from components.tts import speak_text
 from components import conversation
+
+# Conditionally import database manager for conversation logging
+if config.LOGGING_ENABLED:
+    from components import db_manager
 
 # Configure logging
 logging.basicConfig(
@@ -86,6 +91,13 @@ def run_conversation() -> None:
             conversation.add_assistant_message(llm_response)
             speak_text(llm_response)
 
+            # Log successful conversation turn
+            if config.LOGGING_ENABLED:
+                try:
+                    db_manager.save_conversation(user_input, llm_response, 'completed')
+                except Exception as log_error:
+                    print(f"Warning: Failed to log conversation: {log_error}", file=sys.stderr)
+
         except KeyboardInterrupt:
             logger.info("Conversation interrupted by user (Ctrl+C)")
             farewell = "Goodbye!"
@@ -95,6 +107,16 @@ def run_conversation() -> None:
             logger.error(f"Error in conversation turn {turn_count}: {e}", exc_info=True)
             error_msg = "Sorry, something went wrong. Let's try again."
             speak_text(error_msg)
+
+            # Log failed conversation turn
+            if config.LOGGING_ENABLED:
+                try:
+                    # Get user_input if it was captured before the error
+                    failed_user_input = user_input if 'user_input' in locals() else None
+                    db_manager.save_conversation(failed_user_input, None, 'failed', str(e))
+                except Exception as log_error:
+                    print(f"Warning: Failed to log error conversation: {log_error}", file=sys.stderr)
+
             continue
 
     logger.info(f"Conversation ended after {turn_count} turns")

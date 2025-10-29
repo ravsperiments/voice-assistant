@@ -8,6 +8,8 @@ services:
       - /dev/snd:/dev/snd
     group_add:
       - audio
+    volumes:
+      - ./data:/app/data
     restart: unless-stopped
     working_dir: /app
     command: ["python", "main.py"]
