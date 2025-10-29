@@ -5,6 +5,10 @@ scripts/import_plan_to_github.py
 .env.local
 .env.*.local
 
+# Conversation logging database
+data/
+*.db-shm
+*.db-wal
 
 # Project artifacts
 .project_artifacts/
